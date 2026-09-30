@@ -2,8 +2,6 @@
 
 namespace Winter\SEO\Tests\Unit;
 
-use ReflectionClass;
-use ReflectionMethod;
 use System\Tests\Bootstrap\TestCase;
 use Winter\SEO\Classes\Link;
 use Winter\SEO\Classes\Meta;
@@ -28,22 +26,23 @@ class SEOTagsRobotsTest extends TestCase
     }
 
     /**
-     * Invoke processPageMeta on an instance created without the constructor, with a
-     * page that carries only a nofollow setting
+     * Render the meta tags for a page whose nofollow setting is $nofollow, built
+     * without the constructor so that no CMS request is needed. getMetaTags() calls
+     * processPageMeta() first, which is the code under test here.
      */
-    protected function processPageMetaWithNofollow(): void
+    protected function renderMetaTagsForPage(bool $nofollow): void
     {
-        $component = (new ReflectionClass(SEOTags::class))->newInstanceWithoutConstructor();
+        $component = (new \ReflectionClass(SEOTags::class))->newInstanceWithoutConstructor();
 
         $page = new \stdClass;
         foreach (['meta_title', 'meta_description', 'meta_image', 'paginatePrev', 'paginateNext'] as $property) {
             $page->{$property} = '';
         }
-        $page->meta_nofollow = 1;
+        $page->meta_nofollow = $nofollow ? 1 : '';
 
         $this->setProtectedProperty($component, 'page', $page);
 
-        (new ReflectionMethod(SEOTags::class, 'processPageMeta'))->invoke($component);
+        $component->getMetaTags();
     }
 
     /**
@@ -54,7 +53,7 @@ class SEOTagsRobotsTest extends TestCase
     {
         Link::set('robots', 'index, follow');
 
-        $this->processPageMetaWithNofollow();
+        $this->renderMetaTagsForPage(true);
 
         $this->assertSame('index, follow, nofollow', Link::get('robots'));
     }
@@ -65,7 +64,7 @@ class SEOTagsRobotsTest extends TestCase
      */
     public function testNofollowIsUnchangedWhenNothingIsConfigured()
     {
-        $this->processPageMetaWithNofollow();
+        $this->renderMetaTagsForPage(true);
 
         $this->assertSame('nofollow', Link::get('robots'));
     }
@@ -77,14 +76,7 @@ class SEOTagsRobotsTest extends TestCase
     {
         Link::set('robots', 'index, follow');
 
-        $component = (new ReflectionClass(SEOTags::class))->newInstanceWithoutConstructor();
-        $page = new \stdClass;
-        foreach (['meta_title', 'meta_description', 'meta_image', 'meta_nofollow', 'paginatePrev', 'paginateNext'] as $property) {
-            $page->{$property} = '';
-        }
-        $this->setProtectedProperty($component, 'page', $page);
-
-        (new ReflectionMethod(SEOTags::class, 'processPageMeta'))->invoke($component);
+        $this->renderMetaTagsForPage(false);
 
         $this->assertSame('index, follow', Link::get('robots'));
     }
