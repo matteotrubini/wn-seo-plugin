@@ -66,6 +66,33 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Optional SEO form fields
+    |--------------------------------------------------------------------------
+    |
+    | Some SEO fields are opt-in, because adding them changes the form of
+    | every SeoableModel and every CMS page in the install. A field marked
+    | `requiresConfig` in the fields YAML is skipped unless the key named
+    | there is truthy, so leaving these off keeps the forms exactly as they
+    | were.
+    |
+    */
+
+    'includeRobotsFields' => false,
+
+    /*
+    |--------------------------------------------------------------------------
+    | Default robots directives
+    |--------------------------------------------------------------------------
+    |
+    | Applied to every page that does not set its own value, for example
+    | 'index, follow'. Leave null for no site-wide default.
+    |
+    */
+
+    'defaultRobots' => null,
+
+    /*
+    |--------------------------------------------------------------------------
     | Seoable Models
     |--------------------------------------------------------------------------
     |

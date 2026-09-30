@@ -169,7 +169,12 @@ class Plugin extends PluginBase
 
                 $fields = [];
                 foreach ($seoForm['fields'] as $name => $config) {
+                    if (!$this->isFieldEnabled($config)) {
+                        continue;
+                    }
+
                     $config['tab'] = $tab;
+                    unset($config['requiresConfig']);
                     $fields["{$prefix}[{$name}]"] = $config;
                 }
 
@@ -223,7 +228,12 @@ class Plugin extends PluginBase
             $tab = 'winter.seo::lang.models.meta.label';
             $halcyonFields = [];
             foreach ($form['fields'] as $name => $config) {
+                if (!$this->isFieldEnabled($config)) {
+                    continue;
+                }
+
                 $config['tab'] = $tab;
+                unset($config['requiresConfig']);
                 $halcyonFields["{$prefix}{$name}]"] = $config;
             }
 
@@ -232,6 +242,21 @@ class Plugin extends PluginBase
 
             $widget->tabs['fields'] = array_merge($widget->tabs['fields'], $halcyonFields);
         });
+    }
+
+    /**
+     * Determines whether an SEO form field should be injected. A field carrying
+     * `requiresConfig` is opt-in: it names a key in this plugin's config file,
+     * and it is skipped entirely unless that key is truthy, so an install that
+     * leaves the key off gets exactly the fields it had before.
+     */
+    protected function isFieldEnabled(array $config): bool
+    {
+        if (!array_key_exists('requiresConfig', $config)) {
+            return true;
+        }
+
+        return (bool) Config::get('winter.seo::' . $config['requiresConfig'], false);
     }
 
     /**

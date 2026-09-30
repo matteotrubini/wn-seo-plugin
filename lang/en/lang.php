@@ -32,6 +32,10 @@ return [
                 'description' => 'Description',
                 'image' => 'Image',
                 'nofollow' => 'Tell search engines to ignore links in content',
+                'index' => 'Allow search engines to index this page',
+                'follow' => 'Allow search engines to follow links in this page',
+                'index_default' => 'Use the site default',
+                'follow_default' => 'Use the site default',
             ],
         ],
         'settings' => [

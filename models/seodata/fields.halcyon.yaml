@@ -24,3 +24,21 @@ fields:
         label: winter.seo::lang.models.meta.fields.nofollow
         type: switch
         permissions: winter.seo.manage_meta
+    index:
+        label: winter.seo::lang.models.meta.fields.index
+        type: dropdown
+        emptyOption: winter.seo::lang.models.meta.fields.index_default
+        options:
+            noindex: noindex
+        span: left
+        permissions: winter.seo.manage_meta
+        requiresConfig: includeRobotsFields
+    follow:
+        label: winter.seo::lang.models.meta.fields.follow
+        type: dropdown
+        emptyOption: winter.seo::lang.models.meta.fields.follow_default
+        options:
+            nofollow: nofollow
+        span: right
+        permissions: winter.seo.manage_meta
+        requiresConfig: includeRobotsFields

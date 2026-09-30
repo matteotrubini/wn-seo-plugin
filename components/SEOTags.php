@@ -44,9 +44,32 @@ class SEOTags extends ComponentBase
             $this->page->meta_image = MediaLibrary::url($this->page->meta_image);
         }
 
-        // Handle the nofollow meta property being set
+        // Handle the robots directives. Whatever is already set — by the global
+        // settings, or by the SeoableModel mappings — is kept and composed with,
+        // never replaced. The site-wide default only applies when nothing else has
+        // spoken first, so a page can always override it.
+        $robots = $this->parseRobots(Link::get('robots'));
+
+        if (empty($robots)) {
+            $robots = $this->parseRobots(Config::get('winter.seo::defaultRobots', null));
+        }
+
         if (!empty($this->page->meta_nofollow)) {
-            Link::set('robots', 'nofollow');
+            $robots[] = 'nofollow';
+        }
+
+        if (!empty($this->page->meta_index) && $this->page->meta_index === 'noindex') {
+            $robots[] = 'noindex';
+        }
+
+        if (!empty($this->page->meta_follow) && $this->page->meta_follow === 'nofollow') {
+            $robots[] = 'nofollow';
+        }
+
+        $robots = array_values(array_unique($robots));
+
+        if (!empty($robots)) {
+            Link::set('robots', implode(', ', $robots));
         }
 
         // Set the meta tags based on the current page if not set
@@ -71,6 +94,26 @@ class SEOTags extends ComponentBase
                 }
             }
         }
+    }
+
+    /**
+     * Normalises a robots value into a list of directives. Accepts a comma
+     * separated string or an array, and returns an empty list for anything else,
+     * including null. The plugin's own config is not guaranteed to be loaded —
+     * under the test harness `Config::get('winter.seo')` is null — so this
+     * cannot assume a string is coming back.
+     */
+    protected function parseRobots($value): array
+    {
+        if (is_array($value)) {
+            $value = implode(',', $value);
+        }
+
+        if (!is_string($value)) {
+            return [];
+        }
+
+        return array_values(array_filter(array_map('trim', explode(',', $value))));
     }
 
     /**
