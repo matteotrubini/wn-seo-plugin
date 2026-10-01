@@ -81,18 +81,6 @@ return [
 
     /*
     |--------------------------------------------------------------------------
-    | Default robots directives
-    |--------------------------------------------------------------------------
-    |
-    | Applied to every page that does not set its own value, for example
-    | 'index, follow'. Leave null for no site-wide default.
-    |
-    */
-
-    'defaultRobots' => null,
-
-    /*
-    |--------------------------------------------------------------------------
     | Seoable Models
     |--------------------------------------------------------------------------
     |

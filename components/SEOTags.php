@@ -46,13 +46,8 @@ class SEOTags extends ComponentBase
 
         // Handle the robots directives. Whatever is already set — by the global
         // settings, or by the SeoableModel mappings — is kept and composed with,
-        // never replaced. The site-wide default only applies when nothing else has
-        // spoken first, so a page can always override it.
+        // never replaced.
         $robots = $this->parseRobots(Link::get('robots'));
-
-        if (empty($robots)) {
-            $robots = $this->parseRobots(Config::get('winter.seo::defaultRobots', null));
-        }
 
         if (!empty($this->page->meta_nofollow)) {
             $robots[] = 'nofollow';
@@ -97,18 +92,12 @@ class SEOTags extends ComponentBase
     }
 
     /**
-     * Normalises a robots value into a list of directives. Accepts a comma
-     * separated string or an array, and returns an empty list for anything else,
-     * including null. The plugin's own config is not guaranteed to be loaded —
-     * under the test harness `Config::get('winter.seo')` is null — so this
-     * cannot assume a string is coming back.
+     * Normalises a robots value into a list of directives. TagContainer::set()
+     * type-hints the value as a string, so anything that is not one is treated
+     * as "not set" rather than coerced.
      */
     protected function parseRobots($value): array
     {
-        if (is_array($value)) {
-            $value = implode(',', $value);
-        }
-
         if (!is_string($value)) {
             return [];
         }
