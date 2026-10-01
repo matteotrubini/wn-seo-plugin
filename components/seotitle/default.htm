@@ -1,0 +1,8 @@
+{#
+ # Renders the page title. Nothing is emitted unless the theme places this
+ # component, which is what keeps a plugin-provided title from duplicating one
+ # the theme already writes.
+ #}
+{% if title %}
+    <title>{{ prefix }}{{ title }}{{ suffix }}{% if appName and appName != title %}{{ separator }}{{ appName }}{% endif %}</title>
+{% endif %}
